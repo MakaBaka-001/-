@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人主页</title>
+    <title>张昊 - 联系方式</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -332,13 +332,48 @@
             }, 2000);
         }
         
-        // 复制到剪贴板
+        // 复制到剪贴板（兼容移动设备）
         function copyContact(text, type) {
-            navigator.clipboard.writeText(text.replace(/\s+/g, '')).then(() => {
-                showNotification(`已复制${type}`, 'success');
-            }).catch(err => {
+            // 创建临时textarea元素
+            const textarea = document.createElement('textarea');
+            textarea.value = text.replace(/\s+/g, '');
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'absolute';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            
+            // 选择文本
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length); // 对于移动设备很重要
+            
+            try {
+                // 尝试使用现代API
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(textarea.value).then(() => {
+                        showNotification(`已复制${type}`, 'success');
+                    }).catch(err => {
+                        // 现代API失败，尝试老方法
+                        if (document.execCommand('copy')) {
+                            showNotification(`已复制${type}`, 'success');
+                        } else {
+                            throw new Error('复制失败');
+                        }
+                    });
+                } else {
+                    // 使用老方法
+                    if (document.execCommand('copy')) {
+                        showNotification(`已复制${type}`, 'success');
+                    } else {
+                        throw new Error('复制失败');
+                    }
+                }
+            } catch (err) {
+                // 所有方法都失败
                 showNotification(`复制失败，请手动选择复制`, 'error');
-            });
+            } finally {
+                // 清理临时元素
+                document.body.removeChild(textarea);
+            }
         }
         
         // 添加事件监听器

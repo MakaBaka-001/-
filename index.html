@@ -128,17 +128,17 @@
         
         .notification {
             position: fixed;
-            top: 20px;
+            top: 10px;
             left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: #4db6ac;
+            /* transform: translateX(-50%) translateY(-100px); */
+            background: hsla(174, 68%, 63%, 0.645);
             color: white;
             padding: 14px 36px;
             border-radius: 50px;
             font-weight: 500;
             letter-spacing: 0.5px;
             box-shadow: 0 8px 30px rgba(77, 182, 172, 0.4);
-            transition: transform 0.4s ease;
+            /* transition: transform 0.4s ease; */
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
@@ -215,26 +215,26 @@
 <body>
     <div class="container">
         <div class="profile">
-            <h1>***</h1>
-            <div class="title">***</div>
+            <h1>张 昊</h1>
+            <div class="title">Zhāng Hào</div>
         </div>
         
         <div class="contact-grid">
             <div class="contact-card" id="phoneCard">
                 <div class="contact-type">电话</div>
-                <div class="contact-value">188 8888 8888</div>
+                <div class="contact-value">176 8866 5506</div>
                 <div class="hint"> </div>
             </div>
             
             <div class="contact-card" id="wechatCard">
                 <div class="contact-type">微信</div>
-                <div class="contact-value">123456789</div>
+                <div class="contact-value">Hao_724106</div>
                 <div class="hint"> </div>
             </div>
             
             <div class="contact-card" id="emailCard">
                 <div class="contact-type">邮箱</div>
-                <div class="contact-value">1234567898@163.com</div>
+                <div class="contact-value">ACE666888@163.com</div>
                 <div class="hint"> </div>
             </div>
         </div>
@@ -269,9 +269,9 @@
             });
         }
         
-        function copyContact(text, type) {
+        function copyContact(text) {
             const notificationEl = document.getElementById('copyNotification');
-            notificationEl.textContent = `已复制${type}: ${text}`;
+            notificationEl.textContent = `已复制${text}`;
             
             // 复制到剪贴板
             navigator.clipboard.writeText(text.replace(/\s+/g, '')).then(() => {
@@ -294,17 +294,17 @@
         // 添加事件监听器
         document.getElementById('phoneCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('188 8888 8888', '手机号');
+            copyContact('手机号码');
         });
         
         document.getElementById('wechatCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('123456789', '微信号');
+            copyContact('微信号码');
         });
         
         document.getElementById('emailCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('1234567898@163.com', '邮箱');
+            copyContact('邮箱地址');
         });
     </script>
 </body>

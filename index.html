@@ -2,10 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 添加元标记禁用电话号码自动识别 -->
     <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人联系方式</title>
+    <title>个人主页</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -103,17 +102,15 @@
             font-weight: 500;
             color: #fff;
             word-break: break-all;
-            /* 添加以下样式防止iOS自动格式化 */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            text-decoration: none !important; /* 去除默认的下划线 */
+            text-decoration: none !important;
         }
         
-        /* 解决超链接样式问题 */
         a[href^="tel"] {
             color: inherit !important;
             text-decoration: none !important;
@@ -126,27 +123,54 @@
             font-weight: 300;
         }
         
-        .notification {
+        /* 通知容器 */
+        .notification-container {
             position: fixed;
-            top: 10px;
-            left: 50%;
-            /* transform: translateX(-50%) translateY(-100px); */
-            background: hsla(174, 68%, 63%, 0.645);
-            color: white;
-            padding: 14px 36px;
-            border-radius: 50px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            box-shadow: 0 8px 30px rgba(77, 182, 172, 0.4);
-            /* transition: transform 0.4s ease; */
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             z-index: 1000;
-            opacity: 0;
             pointer-events: none;
         }
         
+        /* 简约通知样式 */
+        .notification {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            transform: translateY(-20px);
+        }
+        
         .notification.show {
-            transform: translateX(-50%) translateY(0);
             opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification-icon {
+            font-size: 16px;
+        }
+        
+        .notification.success .notification-icon {
+            color: #4db6ac;
+        }
+        
+        .notification.error .notification-icon {
+            color: #e57373;
         }
         
         .ripple {
@@ -209,6 +233,12 @@
             h1 {
                 font-size: 2.2rem;
             }
+            
+            .notification {
+                width: 90%;
+                text-align: center;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -240,7 +270,8 @@
         </div>
     </div>
     
-    <div class="notification" id="copyNotification"></div>
+    <!-- 通知容器 -->
+    <div class="notification-container" id="notificationContainer"></div>
     
     <footer>
         <p>保持联系 <span class="pulse"></span> 共创未来</p>
@@ -269,42 +300,61 @@
             });
         }
         
-        function copyContact(text) {
-            const notificationEl = document.getElementById('copyNotification');
-            notificationEl.textContent = `已复制${text}`;
+        // 显示通知函数
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
             
-            // 复制到剪贴板
-            navigator.clipboard.writeText(text.replace(/\s+/g, '')).then(() => {
-                // 显示通知
-                notificationEl.classList.add('show');
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} notification-icon"></i>
+                <span class="notification-text">${message}</span>
+            `;
+            
+            // 添加到容器
+            container.appendChild(notification);
+            
+            // 强制重排以应用初始状态
+            void notification.offsetWidth;
+            
+            // 显示通知
+            notification.classList.add('show');
+            
+            // 3秒后移除通知
+            setTimeout(() => {
+                notification.classList.remove('show');
                 
-                // 3秒后隐藏通知
+                // 动画结束后移除元素
                 setTimeout(() => {
-                    notificationEl.classList.remove('show');
-                }, 2000);
+                    notification.remove();
+                }, 300);
+            }, 2000);
+        }
+        
+        // 复制到剪贴板
+        function copyContact(text, type) {
+            navigator.clipboard.writeText(text.replace(/\s+/g, '')).then(() => {
+                showNotification(`已复制${type}`, 'success');
             }).catch(err => {
-                notificationEl.textContent = `复制失败: ${err}`;
-                notificationEl.classList.add('show');
-                setTimeout(() => {
-                    notificationEl.classList.remove('show');
-                }, 3000);
+                showNotification(`复制失败，请手动选择复制`, 'error');
             });
         }
         
         // 添加事件监听器
         document.getElementById('phoneCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('手机号码');
+            copyContact('176 8866 5506', '手机号');
         });
         
         document.getElementById('wechatCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('微信号码');
+            copyContact('Hao_724106', '微信号');
         });
         
         document.getElementById('emailCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('邮箱地址');
+            copyContact('ACE666888@163.com', '邮箱');
         });
     </script>
 </body>

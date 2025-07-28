@@ -127,11 +127,8 @@
         .notification-container {
             position: fixed;
             top: 20px;
-            left: 0;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1000;
             pointer-events: none;
         }
@@ -152,7 +149,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
             transform: translateY(-20px);
         }
         
@@ -252,7 +248,7 @@
         <div class="contact-grid">
             <div class="contact-card" id="phoneCard">
                 <div class="contact-type">电话</div>
-                <div class="contact-value">+86 176 8866 5506</div>
+                <div class="contact-value">176 8866 5506</div>
                 <div class="hint"> </div>
             </div>
             
@@ -270,8 +266,13 @@
         </div>
     </div>
     
-    <!-- 通知容器 -->
-    <div class="notification-container" id="notificationContainer"></div>
+    <!-- 通知容器 - 始终只有一个通知元素 -->
+    <div class="notification-container" id="notificationContainer">
+        <div class="notification" id="singleNotification">
+            <i class="fas fa-check-circle notification-icon"></i>
+            <span class="notification-text">已复制手机号</span>
+        </div>
+    </div>
     
     <footer>
         <p>保持联系 <span class="pulse"></span> 共创未来</p>
@@ -300,35 +301,51 @@
             });
         }
         
-        // 显示通知函数
+        // 全局变量跟踪当前通知状态
+        let notificationTimeout = null;
+        const notificationEl = document.getElementById('singleNotification');
+        const notificationIcon = notificationEl.querySelector('.notification-icon');
+        const notificationText = notificationEl.querySelector('.notification-text');
+        
+        // 显示通知函数（单通知系统）
         function showNotification(message, type = 'success') {
-            const container = document.getElementById('notificationContainer');
+            // 清除之前的定时器
+            if (notificationTimeout) {
+                clearTimeout(notificationTimeout);
+                notificationTimeout = null;
+            }
             
-            // 创建通知元素
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} notification-icon"></i>
-                <span class="notification-text">${message}</span>
-            `;
+            // 更新通知内容
+            notificationText.textContent = message;
             
-            // 添加到容器
-            container.appendChild(notification);
+            // 更新通知样式
+            notificationEl.className = 'notification';
+            notificationEl.classList.add(type);
             
-            // 强制重排以应用初始状态
-            void notification.offsetWidth;
+            // 更新图标
+            if (type === 'success') {
+                notificationIcon.className = 'fas fa-check-circle notification-icon';
+                notificationIcon.style.color = '#4db6ac';
+            } else {
+                notificationIcon.className = 'fas fa-exclamation-circle notification-icon';
+                notificationIcon.style.color = '#e57373';
+            }
+            
+            // 如果通知正在显示，先隐藏再重新显示以重置动画
+            if (notificationEl.classList.contains('show')) {
+                notificationEl.classList.remove('show');
+                
+                // 强制重排以应用样式变化
+                void notificationEl.offsetWidth;
+            }
             
             // 显示通知
-            notification.classList.add('show');
+            notificationEl.classList.add('show');
             
-            // 3秒后移除通知
-            setTimeout(() => {
-                notification.classList.remove('show');
-                
-                // 动画结束后移除元素
-                setTimeout(() => {
-                    notification.remove();
-                }, 300);
+            // 设置定时器自动移除通知
+            notificationTimeout = setTimeout(() => {
+                notificationEl.classList.remove('show');
+                notificationTimeout = null;
             }, 2000);
         }
         

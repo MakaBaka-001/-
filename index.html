@@ -2,6 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <!-- 添加元标记禁用电话号码自动识别 -->
+    <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人联系方式</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,20 +35,6 @@
         
         .profile {
             margin-bottom: 40px;
-        }
-        
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: 300;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         h1 {
@@ -115,6 +103,20 @@
             font-weight: 500;
             color: #fff;
             word-break: break-all;
+            /* 添加以下样式防止iOS自动格式化 */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            text-decoration: none !important; /* 去除默认的下划线 */
+        }
+        
+        /* 解决超链接样式问题 */
+        a[href^="tel"] {
+            color: inherit !important;
+            text-decoration: none !important;
         }
         
         .hint {
@@ -139,6 +141,7 @@
             transition: transform 0.4s ease;
             z-index: 1000;
             opacity: 0;
+            pointer-events: none;
         }
         
         .notification.show {
@@ -203,12 +206,6 @@
                 font-size: 1.25rem;
             }
             
-            .avatar {
-                width: 100px;
-                height: 100px;
-                font-size: 42px;
-            }
-            
             h1 {
                 font-size: 2.2rem;
             }
@@ -218,27 +215,26 @@
 <body>
     <div class="container">
         <div class="profile">
-            <!-- <div class="avatar">ZM</div> -->
-            <h1>张昊</h1>
-            <div class="title">Zhāng Hào</div>
+            <h1>***</h1>
+            <div class="title">***</div>
         </div>
         
         <div class="contact-grid">
             <div class="contact-card" id="phoneCard">
                 <div class="contact-type">电话</div>
-                <div class="contact-value">176 8866 5506</div>
+                <div class="contact-value">188 8888 8888</div>
                 <div class="hint"> </div>
             </div>
             
             <div class="contact-card" id="wechatCard">
                 <div class="contact-type">微信</div>
-                <div class="contact-value">Hao_724106</div>
+                <div class="contact-value">123456789</div>
                 <div class="hint"> </div>
             </div>
             
             <div class="contact-card" id="emailCard">
                 <div class="contact-type">邮箱</div>
-                <div class="contact-value">ACE666888@163.com</div>
+                <div class="contact-value">1234567898@163.com</div>
                 <div class="hint"> </div>
             </div>
         </div>
@@ -273,42 +269,42 @@
             });
         }
         
-        // function copyContact(text, notification) {
-        //     const notificationEl = document.getElementById('copyNotification');
-        //     notificationEl.textContent = `已复制: ${text}`;
+        function copyContact(text, type) {
+            const notificationEl = document.getElementById('copyNotification');
+            notificationEl.textContent = `已复制${type}: ${text}`;
             
-        //     // 复制到剪贴板
-        //     navigator.clipboard.writeText(text).then(() => {
-        //         // 显示通知
-        //         notificationEl.classList.add('show');
+            // 复制到剪贴板
+            navigator.clipboard.writeText(text.replace(/\s+/g, '')).then(() => {
+                // 显示通知
+                notificationEl.classList.add('show');
                 
-        //         // 3秒后隐藏通知
-        //         setTimeout(() => {
-        //             notificationEl.classList.remove('show');
-        //         }, 2000);
-        //     }).catch(err => {
-        //         notificationEl.textContent = `复制失败: ${err}`;
-        //         notificationEl.classList.add('show');
-        //         setTimeout(() => {
-        //             notificationEl.classList.remove('show');
-        //         }, 3000);
-        //     });
-        // }
+                // 3秒后隐藏通知
+                setTimeout(() => {
+                    notificationEl.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                notificationEl.textContent = `复制失败: ${err}`;
+                notificationEl.classList.add('show');
+                setTimeout(() => {
+                    notificationEl.classList.remove('show');
+                }, 3000);
+            });
+        }
         
         // 添加事件监听器
         document.getElementById('phoneCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('17688665506', '手机');
+            copyContact('188 8888 8888', '手机号');
         });
         
         document.getElementById('wechatCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('Hao_724106', '微信号');
+            copyContact('123456789', '微信号');
         });
         
         document.getElementById('emailCard').addEventListener('click', function(e) {
             createRipple(e);
-            copyContact('ACE666888@163.com', '邮箱');
+            copyContact('1234567898@163.com', '邮箱');
         });
     </script>
 </body>
